@@ -1,25 +1,25 @@
 [![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/M0kyOMLZ)
-# Frobnicator (this is a template)
+# Cellsim
 
 ## Authors
-- Andrzej Głuszak (@agluszak on GitHub)
-- Linus Torvalds (@torvalds on GitHub)
+- Maciej Gryz (@folicore on GitHub)
 
 ## Description
-Frobnicator is going to be a platformer game similar to Super Mario Bros made using Korge game engine.
+cellsim is a Kotlin package, with purpose of simplyfying process of making cellular automata, while still giving user a lot of freedom of possible behaviours.
 
 ## Features
-- map generator
-- shooting
-- enemy AI
-- game state saving and loading
-- scores
+- creating fully working automata with defining just a few functions and objects defining its behaviour
+- designing cell behaviour with any Kotlin functions (with proper arguments and return type)
+- some level of runtime safety, trying to detect errors made in urer's cell bahaviour
+- optimised model of simulation (multithreading, etc.)
+- ability to modify cells by hand between steps
+- console display
+- GUI to run simulations (2nd part)
 
 ## Plan
-In the first part we're going to implement the basics: movement, physics and shooting. The enemies will simply bounce from one edge of the platform to the other. There will be only a single map.
+In the first part, I'm planning on implementing base features of the package.
 
-In the second part we're going to add random map generator, saving/loading, scores and a more sophisticated AI.
+In the second part, I'm planning to implement GUI.
 
 ## Libraries
-- Korge (https://korge.org/)
-- kotlinx-serialization (https://github.com/Kotlin/kotlinx.serialization)
+- ??? (GUI)
