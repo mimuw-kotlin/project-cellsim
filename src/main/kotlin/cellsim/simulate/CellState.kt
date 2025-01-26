@@ -14,4 +14,10 @@ class CellState internal constructor(val range: CellStateRange, vararg state: In
         if (range != other.range) return false
         return state == other.state
     }
+
+    // Checks if cell state "has" given subState, that is if
+    infix fun has(subState: CellStateRange.CellSubState): Boolean {
+        if (range != subState.of) throw IllegalArgumentException("sub-state comes from different state range")
+        return state[subState.at] == subState.value
+    }
 }

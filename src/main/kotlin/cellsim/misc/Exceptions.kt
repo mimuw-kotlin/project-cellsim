@@ -1,5 +1,6 @@
 package cellsim.misc
 
+// For prettier exception messages:
 internal fun nValuesStr(n: Int) = "$n value" + (if (n != 1) "s" else "")
 internal fun nthOrdinalStr(n: Int) = "$n" + when {
     (n % 100) == 11 || (n % 100) == 12 || (n % 100) == 13 -> "th"

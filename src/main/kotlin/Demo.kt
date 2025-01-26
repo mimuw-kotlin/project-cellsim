@@ -7,7 +7,11 @@ import main.kotlin.cellsim.examples.LangtonsAnt
 import kotlin.math.max
 import kotlin.random.Random
 
+// Demo file. Technically not a part of the package, just an example of usage.
+// Feel free to modify.
+
 fun main(args: Array<String>) {
+    // Uncomment one of the functions, that you want to see results of.
     //gun()
     //gunRGBY()
     //gunFading(25)
@@ -22,7 +26,7 @@ fun gun() {
     val csr = auto.stateRange
 
     for (c in GameOfLife.Patterns.gosperGliderGun) {
-        auto.setCell(c.x, c.y, csr.makeCellState(1))
+        auto.setCell(c.x, c.y, csr.makeCellState(GameOfLife.ALIVE))
     }
 
     for (i in 0..101) {
@@ -38,7 +42,7 @@ fun gunRGBY() {
     val rng = Random(42)
 
     for (c in GameOfLife.Patterns.gosperGliderGun) {
-        auto.setCell(c.x, c.y, csr.makeCellState(rng.nextInt(1, 5)))
+        auto.setCell(c.x, c.y, csr.makeCellState(rng.nextInt(0, 4)))
     }
 
     for (i in 0..101) {
@@ -49,7 +53,8 @@ fun gunRGBY() {
 }
 
 fun gunFading(lifespan: Int, dyingOfOldAge: Boolean = true) {
-    val auto = GameOfLifeFading.automaton(lifespan, dyingOfOldAge)
+    val rules = GameOfLifeFading(lifespan)
+    val auto = rules.automaton(dyingOfOldAge)
     val csr = auto.stateRange
     val rng = Random(42)
 
@@ -60,7 +65,7 @@ fun gunFading(lifespan: Int, dyingOfOldAge: Boolean = true) {
     for (i in 0..101) {
         if (i > 0) auto.step()
         println("$i:")
-        auto.printBoard(-20, 20, -16, 6, GameOfLifeFading.displayFading(lifespan))
+        auto.printBoard(-20, 20, -16, 6, rules.displayFading())
     }
 }
 

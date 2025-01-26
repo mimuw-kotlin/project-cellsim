@@ -8,63 +8,75 @@ import cellsim.simulate.MutableNeighborhood
 import cellsim.simulate.NextCellStateCalculator
 
 // Langton's ant simulator for single ant
-class LangtonsAnt {
-    companion object {
-        fun factory(): Automaton.Factory {
-            val factory = Automaton.Factory()
+object LangtonsAnt {
+    val stateRange = CellStateRange(2, 5)
+    val BLACK = stateRange.nameSubState(0, 0, "Dead")
+    val WHITE = stateRange.nameSubState(0, 1, "White")
+    val NO_ANT = stateRange.nameSubState(1, 0, "No ant")
+    val NORTH = stateRange.nameSubState(1, 1, "North")
+    val EAST = stateRange.nameSubState(1, 2, "East")
+    val SOUTH = stateRange.nameSubState(1, 3, "South")
+    val WEST = stateRange.nameSubState(1, 4, "West")
 
-            // first value is the color of the cell,
-            // second is ant state at this cell [none, north, east, south, west]
-            factory.stateRange = CellStateRange(2, 5)
+    fun factory(): Automaton.Factory {
+        val factory = Automaton.Factory()
 
-            factory.neighborhood = MutableNeighborhood().addPoint(-1, 0).addPoint(1, 0)
-                .addPoint(0, -1).addPoint(0, 1)
+        factory.stateRange = stateRange
 
-            factory.defaultCellState = DefaultCellStateGenerator{ it.stateRange.makeCellState(0, 0) }
+        factory.neighborhood = MutableNeighborhood().addPoint(-1, 0).addPoint(1, 0)
+            .addPoint(0, -1).addPoint(0, 1)
 
-            factory.nextStateFunc = NextCellStateCalculator{
-                fun antNewDir(dx: Int, dy: Int): Int {
-                    val cell = it.getCell(dx, dy)
-                    if (cell[1] == 0) return 0
+        factory.defaultCellState = DefaultCellStateGenerator{ it.stateRange.makeCellState(BLACK, NO_ANT) }
 
-                    return if (cell[0] == 0) (1 + ((cell[1] - 1) + 1) % 4)
-                        else (1 + ((cell[1] - 1) + 3) % 4)
-                }
+        factory.nextStateFunc = NextCellStateCalculator{
+            fun antNewDir(dx: Int, dy: Int): CellStateRange.CellSubState {
+                val cell = it.getCell(dx, dy)
+                if (cell has NO_ANT) return NO_ANT
 
-                var newColor = it.thisCell()[0]
-                var newAnt = 0
-
-                if (it.thisCell()[1] > 0) { // has ant
-                    newColor = 1 - it.thisCell()[0]
-                } else if (antNewDir(0, -1) == 1) { // from south
-                    newAnt = 1
-                } else if (antNewDir(-1, 0) == 2) { // from west
-                    newAnt = 2
-                } else if (antNewDir(0, 1) == 3) { // from north
-                    newAnt = 3
-                } else if (antNewDir(1, 0) == 4) { // from east
-                    newAnt = 4
-                }
-
-                it.stateRange.makeCellState(newColor, newAnt)
+                if (cell has BLACK && cell has NORTH) return EAST
+                if (cell has WHITE && cell has NORTH) return WEST
+                if (cell has BLACK && cell has EAST)  return SOUTH
+                if (cell has WHITE && cell has EAST)  return NORTH
+                if (cell has BLACK && cell has SOUTH) return WEST
+                if (cell has WHITE && cell has SOUTH) return EAST
+                if (cell has BLACK && cell has WEST)  return NORTH
+                /*if (cell has WHITE && cell has WEST)*/ return SOUTH
+                /*return if (cell[0] == 0) (1 + ((cell[1] - 1) + 1) % 4)
+                    else (1 + ((cell[1] - 1) + 3) % 4)*/
             }
 
-            return factory
-        }
+            var newColor = if (it.thisCell() has BLACK) BLACK else WHITE
+            var newAnt = NO_ANT
 
-        fun automaton() = factory().create()
-
-        val displayAnt = ConsoleCellPrinter{
-            val symbol = when(it[1]) {
-                0 -> " "
-                1 -> "N"
-                2 -> "E"
-                3 -> "S"
-                4 -> "W"
-                else -> throw IllegalArgumentException()
+            if (!(it.thisCell() has NO_ANT)) { // has ant
+                newColor = if (it.thisCell() has BLACK) WHITE else BLACK
+            } else if (antNewDir(0, -1) == NORTH) { // from south
+                newAnt = NORTH
+            } else if (antNewDir(-1, 0) == EAST) { // from west
+                newAnt = EAST
+            } else if (antNewDir(0, 1) == SOUTH) { // from north
+                newAnt = SOUTH
+            } else if (antNewDir(1, 0) == WEST) { // from east
+                newAnt = WEST
             }
-            "\u001b[31;${if (it[0] == 0) 40 else 47}m ${symbol} \u001b[m"
+
+            it.stateRange.makeCellState(newColor, newAnt)
         }
+
+        return factory
     }
 
+    fun automaton() = factory().create()
+
+    val displayAnt = ConsoleCellPrinter{
+        val symbol = when {
+            it has NO_ANT -> " "
+            it has NORTH -> "N"
+            it has EAST -> "E"
+            it has SOUTH -> "S"
+            it has WEST -> "W"
+            else -> throw IllegalArgumentException()
+        }
+        "\u001b[31;${if (it has BLACK) 40 else 47}m ${symbol} \u001b[m"
+    }
 }
